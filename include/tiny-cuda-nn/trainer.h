@@ -179,6 +179,13 @@ public:
 		optimizer_step(nullptr, loss_scale);
 	}
 
+	void schedule_step(uint32_t step, uint32_t n_images){
+		if (step % n_images == 0) {
+			float base_lr = m_optimizer->base_learning_rate();
+			m_optimizer->set_learning_rate(base_lr * std::pow(0.1f, std::min((float)step / (float)n_images / 1000.0f, 1.0f)));
+		}
+	}
+
 	void training_step(
 		cudaStream_t stream,
 		const GPUMatrixDynamic<T>& input,

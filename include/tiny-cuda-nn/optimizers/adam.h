@@ -166,7 +166,8 @@ public:
 			m_relative_weight_decay,
 			m_absolute_weight_decay,
 			loss_scale,
-			m_base_learning_rate,
+			// m_base_learning_rate,
+			m_real_learning_rate,
 			m_non_matrix_learning_rate_factor,
 			m_optimize_matrix_params,
 			m_optimize_non_matrix_params,
@@ -186,11 +187,17 @@ public:
 	}
 
 	float learning_rate() const override {
+		// return m_base_learning_rate;
+		return m_real_learning_rate;
+	}
+
+	float base_learning_rate() const override {
 		return m_base_learning_rate;
 	}
 
 	void set_learning_rate(float val) override {
-		m_base_learning_rate = val;
+		// m_base_learning_rate = val;
+		m_real_learning_rate = val;
 	}
 
 	uint32_t step() const override {
@@ -220,6 +227,7 @@ public:
 
 		if (params.contains("learning_rate")) {
 			m_base_learning_rate = params["learning_rate"];
+			// m_real_learning_rate = m_base_learning_rate;
 		}
 
 		if (params.contains("l2_reg")) {
@@ -258,6 +266,7 @@ public:
 			{"beta2", m_beta2},
 			{"epsilon", m_epsilon},
 			{"learning_rate", m_base_learning_rate},
+			{"real_learning_rate", m_real_learning_rate},
 			{"l2_reg", m_l2_reg},
 			{"adabound", m_adabound},
 			{"relative_decay", m_relative_weight_decay},
@@ -272,6 +281,7 @@ public:
 		json data;
 		data["current_step"] = m_current_step;
 		data["base_learning_rate"] = m_base_learning_rate;
+		data["real_learning_rate"] = m_real_learning_rate;
 		data["first_moments_binary"] = m_first_moments;
 		data["second_moments_binary"] = m_second_moments;
 		data["param_steps_binary"] = m_param_steps;
@@ -304,6 +314,7 @@ private:
 	// Hyperparameters
 	float m_non_matrix_learning_rate_factor = 1.0f;
 	float m_base_learning_rate = 1e-3f;
+	float m_real_learning_rate = 1e-2f;
 	float m_beta1 = 0.9f;
 	float m_beta2 = 0.999f;
 	float m_epsilon = 1e-8f;

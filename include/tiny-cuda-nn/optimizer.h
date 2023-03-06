@@ -45,6 +45,7 @@ public:
 	virtual void allocate(std::shared_ptr<ParametricObject<T>> target) = 0;
 	virtual void step(cudaStream_t stream, float loss_scale, float* weights_full_precision, T* weights, const T* gradients) = 0;
 	virtual float learning_rate() const = 0;
+	virtual float base_learning_rate() const { return learning_rate(); };
 	virtual void set_learning_rate(float val) = 0;
 	virtual uint32_t step() const = 0;
 	virtual uint32_t n_weights() const = 0;
