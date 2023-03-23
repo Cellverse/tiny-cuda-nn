@@ -102,7 +102,7 @@ __host__ __device__ void warp_activation(Activation activation, const fragment_t
 		case Activation::Softplus:
 			TCNN_PRAGMA_UNROLL
 			for (int t=0; t < result.num_elements; t++) {
-				result.x[t] = (T)(logf(expf((float)frag.x[t]) + 1.0f));
+				result.x[t] = ((float)frag.x[t] < 20.0f) ? (T)(logf(expf((float)frag.x[t]) + 1.0f)) : (T)frag.x[t];
 			}
 			return;
 		case Activation::None: result = frag; return;
@@ -160,7 +160,7 @@ __host__ __device__ void warp_activation_backward_in(Activation activation, cons
 			TCNN_PRAGMA_UNROLL
 			for (int t=0; t < result.num_elements; t++) {
 				float tmp = expf((float)frag.x[t]);
-				result.x[t] = frag.x[t] * (T)(tmp / (tmp + 1));
+				result.x[t] = ((float)frag.x[t] < 20.0f) ? (frag.x[t] * (T)(tmp / (tmp + 1))) : frag.x[t];
 			}
 			return;
 		case Activation::None: result = frag; return;
@@ -214,7 +214,7 @@ __host__ __device__ void warp_activation_backward(Activation activation, const f
 		case Activation::Softplus:
 			TCNN_PRAGMA_UNROLL
 			for (int t=0; t < result.num_elements; t++) {
-				result.x[t] = frag.x[t] * (T)(1.0f - expf(-(float)forward_frag.x[t]));
+				result.x[t] = ((float)forward_frag.x[t] < logf(1 + expf(20.0f))) ? frag.x[t] * (T)(1.0f - expf(-(float)forward_frag.x[t])) : frag.x[t];
 			}
 			return;
 		case Activation::None: result = frag; return;
